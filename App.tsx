@@ -54,7 +54,11 @@ import {
   Power,
   MessageSquare,
   FileEdit,
-  CreditCard as IdCardIcon
+  CreditCard as IdCardIcon,
+  Wifi,
+  WifiOff,
+  Box, // Icon for Box
+  Layers // Icon for Packs
 } from 'lucide-react';
 import { 
   BarChart, 
@@ -150,7 +154,7 @@ interface ReceiptData {
   date: string;
   id: string;
   customerName: string;
-  customerCI?: string; // New CI Field
+  customerCI?: string; 
   items: {
     name: string;
     qty: number;
@@ -166,75 +170,85 @@ interface ReceiptData {
   };
 }
 
-const ReceiptTemplate: React.FC<{ data: ReceiptData }> = ({ data }) => {
+const ReceiptTemplate: React.FC<{ data: ReceiptData; settings?: any }> = ({ data, settings }) => {
   return (
-    <div className="font-mono text-sm max-w-[300px] mx-auto p-4 border-2 border-dashed border-gray-300 print:border-none print:max-w-none print:w-full bg-white">
-      <div className="text-center mb-4">
-        <h1 className="text-xl font-bold uppercase">Almacén Pro</h1>
-        <p className="text-xs">Control de Inventario</p>
-        <div className="border-b border-black my-2"></div>
-        <h2 className="font-bold text-lg">{data.title}</h2>
-        <p className="text-xs">Fecha: {new Date(data.date).toLocaleString()}</p>
-        <p className="text-xs">Folio: {data.id.slice(-6).toUpperCase()}</p>
+    <div className="font-mono text-[11px] w-[58mm] mx-auto p-1 border-2 border-dashed border-gray-300 print:border-none print:w-full bg-white leading-tight">
+      <div className="text-center mb-2">
+        {settings?.ticketHeader ? (
+           <div className="whitespace-pre-wrap font-bold mb-1">{settings.ticketHeader}</div>
+        ) : (
+          <>
+            <h1 className="text-sm font-bold uppercase">The Brothers</h1>
+            <p className="text-[9px]">Control de Inventario</p>
+          </>
+        )}
+        <div className="border-b border-black my-1"></div>
+        <h2 className="font-bold text-xs">{data.title}</h2>
+        <p className="text-[9px]">Fecha: {new Date(data.date).toLocaleString()}</p>
+        <p className="text-[9px]">Folio: {data.id.slice(-6).toUpperCase()}</p>
       </div>
 
-      <div className="mb-4">
+      <div className="mb-2">
         <p className="font-bold">Cliente:</p>
         <p>{data.customerName}</p>
-        {data.customerCI && <p className="text-xs">CI/RUC: {data.customerCI}</p>}
+        {data.customerCI && <p className="text-[9px]">CI/RUC: {data.customerCI}</p>}
       </div>
 
-      <table className="w-full mb-4 text-xs">
+      <table className="w-full mb-2 text-[10px]">
         <thead>
           <tr className="border-b border-black text-left">
-            <th className="py-1">Cant</th>
-            <th className="py-1">Desc</th>
-            <th className="py-1 text-right">$$</th>
+            <th className="py-0.5">Cant</th>
+            <th className="py-0.5">Desc</th>
+            <th className="py-0.5 text-right">$$</th>
           </tr>
         </thead>
         <tbody>
           {data.items.map((item, idx) => (
             <tr key={idx}>
-              <td className="py-1 align-top">{item.qty}</td>
-              <td className="py-1 align-top">{item.name}</td>
-              <td className="py-1 text-right align-top">${item.total.toFixed(2)}</td>
+              <td className="py-0.5 align-top">{item.qty}</td>
+              <td className="py-0.5 align-top">{item.name}</td>
+              <td className="py-0.5 text-right align-top">${item.total.toFixed(2)}</td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      <div className="border-t border-black pt-2 mb-4">
-        <div className="flex justify-between font-bold text-lg">
+      <div className="border-t border-black pt-1 mb-2">
+        <div className="flex justify-between font-bold text-xs">
           <span>TOTAL:</span>
           <span>${data.totalAmount.toFixed(2)}</span>
         </div>
         {data.dailyStats && (
-           <div className="mt-2 text-xs space-y-1 pt-2 border-t border-dashed border-gray-400">
-             <div className="flex justify-between"><span>Ventas Directas:</span> <span>${data.dailyStats.cashSales.toFixed(2)}</span></div>
-             <div className="flex justify-between"><span>Cobros Deuda:</span> <span>${data.dailyStats.settlements.toFixed(2)}</span></div>
-             <div className="flex justify-between font-bold"><span>Total Efectivo:</span> <span>${data.dailyStats.totalCash.toFixed(2)}</span></div>
+           <div className="mt-1 text-[9px] space-y-0.5 pt-1 border-t border-dashed border-gray-400">
+             <div className="flex justify-between"><span>Ventas Efec:</span> <span>${data.dailyStats.cashSales.toFixed(2)}</span></div>
+             <div className="flex justify-between"><span>Cobros:</span> <span>${data.dailyStats.settlements.toFixed(2)}</span></div>
+             <div className="flex justify-between font-bold"><span>Total:</span> <span>${data.dailyStats.totalCash.toFixed(2)}</span></div>
            </div>
         )}
       </div>
 
       {data.notes && (
-        <div className="text-xs mb-4 italic border p-1 border-gray-400 whitespace-pre-wrap">
+        <div className="text-[9px] mb-2 italic border p-1 border-gray-400 whitespace-pre-wrap">
           Nota: {data.notes}
         </div>
       )}
 
-      {/* Signature Area for Consignments */}
       {data.type === 'CONSIGNMENT' && (
-        <div className="mt-12 text-center">
-          <div className="border-b border-black w-3/4 mx-auto mb-2"></div>
-          <p className="text-xs font-bold">FIRMA DE ACEPTACIÓN DE DEUDA</p>
-          <p className="text-[10px] text-gray-500 mt-1">Reconozco recibir la mercancía.</p>
+        <div className="mt-8 text-center">
+          <div className="border-b border-black w-3/4 mx-auto mb-1"></div>
+          <p className="text-[9px] font-bold">FIRMA DE ACEPTACIÓN</p>
         </div>
       )}
 
-      <div className="text-center text-xs mt-6">
-        <p>¡Gracias por su preferencia!</p>
-        <p className="mt-2 text-[10px] text-gray-500">Sistema Almacén Pro</p>
+      <div className="text-center text-[9px] mt-4">
+        {settings?.ticketFooter ? (
+           <div className="whitespace-pre-wrap">{settings.ticketFooter}</div>
+        ) : (
+          <>
+            <p>¡Gracias por su preferencia!</p>
+            <p className="mt-1">Sistema The Brothers</p>
+          </>
+        )}
       </div>
     </div>
   );
@@ -272,12 +286,11 @@ const LoginScreen: React.FC<{ onLogin: (role: UserRole, userName: string) => voi
            </button>
         )}
         <div className="bg-indigo-600 p-8 text-center">
-           <h1 className="text-3xl font-bold text-white mb-2">Almacén Pro</h1>
+           <h1 className="text-3xl font-bold text-white mb-2">The Brothers</h1>
            <p className="text-indigo-100">Sistema de Control</p>
         </div>
         <div className="p-8">
            <form onSubmit={handleLogin} className="space-y-6">
-             
              <div className="space-y-2">
                <label className="text-sm font-medium text-gray-700">Usuario</label>
                <div className="relative">
@@ -292,7 +305,6 @@ const LoginScreen: React.FC<{ onLogin: (role: UserRole, userName: string) => voi
                  />
                </div>
              </div>
-
              <div className="space-y-2">
                <label className="text-sm font-medium text-gray-700">Contraseña</label>
                <div className="relative">
@@ -306,13 +318,11 @@ const LoginScreen: React.FC<{ onLogin: (role: UserRole, userName: string) => voi
                  />
                </div>
              </div>
-
              {error && (
                <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg flex items-center gap-2">
                  <AlertCircle size={16} /> {error}
                </div>
              )}
-
              <Button type="submit" className="w-full py-3 text-lg">
                Iniciar Sesión
              </Button>
@@ -331,7 +341,7 @@ const LoginScreen: React.FC<{ onLogin: (role: UserRole, userName: string) => voi
 // --- Helpers ---
 const generateSKU = () => {
   const prefix = "PROD";
-  const random = Math.floor(100000 + Math.random() * 900000); // 6 digit number
+  const random = Math.floor(100000 + Math.random() * 900000); 
   return `${prefix}-${random}`;
 };
 
@@ -364,6 +374,8 @@ interface CartItem {
   product: Product;
   quantity: number;
   price: number;
+  type: 'unit' | 'box'; // Distinguish between unit and box sales
+  unitsInPack: number;  // How many actual units this item represents
 }
 
 // --- Main App ---
@@ -371,12 +383,13 @@ interface CartItem {
 export default function App() {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [currentUsername, setCurrentUsername] = useState<string>('');
-
   const [activeTab, setActiveTab] = useState<'inventory' | 'sales' | 'consignments' | 'finances' | 'customers' | 'ai' | 'history' | 'settings'>('inventory');
   
+  // Connection Status State
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
   // Initialize state directly from storage
   const [data, setData] = useState<AppState>(() => Storage.loadData());
-  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isElectron, setIsElectron] = useState(false);
   
@@ -390,7 +403,7 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartCustomer, setCartCustomer] = useState<string>("");
-  const [cartNote, setCartNote] = useState<string>(""); // State for optional note
+  const [cartNote, setCartNote] = useState<string>(""); 
 
   // Modals State
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -401,6 +414,7 @@ export default function App() {
   const [isCustomerPaymentModalOpen, setIsCustomerPaymentModalOpen] = useState(false);
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   const [isReceiptEditModalOpen, setIsReceiptEditModalOpen] = useState(false);
+  const [isEditConsignmentModalOpen, setIsEditConsignmentModalOpen] = useState(false);
   
   // Selection State
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -423,7 +437,6 @@ export default function App() {
     callback?: () => void 
   } | null>(null);
 
-  // File Upload Ref
   const fileInputRef = useRef<HTMLInputElement>(null);
   const directoryInputRef = useRef<HTMLInputElement>(null);
 
@@ -435,6 +448,18 @@ export default function App() {
     if (userAgent.indexOf(' electron/') > -1) {
       setIsElectron(true);
     }
+  }, []);
+
+  // Monitor Connectivity
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
   }, []);
 
   // Persist data whenever it changes
@@ -474,7 +499,6 @@ export default function App() {
         setPendingDataUpdate(null);
     }
     
-    // Give a tiny delay for React state to update before print triggers blocking behavior
     setTimeout(() => {
         window.print();
         setIsReceiptEditModalOpen(false);
@@ -482,12 +506,10 @@ export default function App() {
   };
 
   const handleCancelPrint = () => {
-    // Abort transaction
     setPendingDataUpdate(null);
     setIsReceiptEditModalOpen(false);
   };
 
-  // --- Transaction Deletion Logic (Returns) ---
   const handleDeleteTransaction = (transactionId: string) => {
     if (!window.confirm("¿Estás seguro de eliminar este movimiento? Esta acción revertirá el stock y los saldos.")) return;
 
@@ -497,19 +519,15 @@ export default function App() {
     let updatedProducts = [...data.products];
     let updatedConsignments = [...data.consignments];
     
-    // Reverse Logic
     if (tx.type === TransactionType.SALE) {
-      // Return stock
       updatedProducts = updatedProducts.map(p => 
         p.id === tx.productId ? { ...p, stock: p.stock + tx.quantity } : p
       );
     } else if (tx.type === TransactionType.STOCK_IN) {
-      // Remove stock (correction)
       updatedProducts = updatedProducts.map(p => 
         p.id === tx.productId ? { ...p, stock: Math.max(0, p.stock - tx.quantity) } : p
       );
     } else if (tx.type === TransactionType.CONSIGNMENT_OUT) {
-      // Remove consignment debt AND return stock
       if (tx.relatedConsignmentId) {
          updatedConsignments = updatedConsignments.filter(c => c.id !== tx.relatedConsignmentId);
       }
@@ -517,7 +535,6 @@ export default function App() {
         p.id === tx.productId ? { ...p, stock: p.stock + tx.quantity } : p
       );
     } else if (tx.type === TransactionType.CONSIGNMENT_SETTLE) {
-      // Reverse payment (increase debt back)
       if (tx.relatedConsignmentId) {
         updatedConsignments = updatedConsignments.map(c => {
            if (c.id === tx.relatedConsignmentId) {
@@ -525,7 +542,7 @@ export default function App() {
              return {
                ...c,
                paidAmount: newPaid,
-               status: ConsignmentStatus.PENDING, // Re-open debt if it was closed
+               status: ConsignmentStatus.PENDING,
                dateSettled: undefined
              };
            }
@@ -552,40 +569,56 @@ export default function App() {
 
   // --- Cart Actions ---
 
-  const handleAddToCart = (product: Product) => {
-    if (product.stock <= 0) {
-      alert("Producto sin stock disponible.");
+  const handleAddToCart = (product: Product, type: 'unit' | 'box' = 'unit') => {
+    // Determine quantity to deduct based on type
+    const unitsToAdd = type === 'box' ? (product.unitsPerBox || 1) : 1;
+    const priceToAdd = type === 'box' ? (product.boxPrice || product.basePrice * unitsToAdd) : product.basePrice;
+
+    if (product.stock < unitsToAdd) {
+      alert(`Stock insuficiente. Tienes ${product.stock} unidades y necesitas ${unitsToAdd}.`);
       return;
     }
 
     setCart(prev => {
-      const existing = prev.find(item => item.product.id === product.id);
+      // Check if same product AND same type (unit/box) exists
+      const existing = prev.find(item => item.product.id === product.id && item.type === type);
+      
       if (existing) {
-        if (existing.quantity >= product.stock) {
-          alert("No puedes agregar más de la cantidad en stock.");
-          return prev;
+        // Check total stock requirement for existing items + new addition
+        // NOTE: This check is simple and might not cover mixed unit/box scenarios perfectly for stock limit in cart, but works for basic flow.
+        if ((existing.quantity * existing.unitsInPack) + unitsToAdd > product.stock) {
+           alert("No puedes agregar más de la cantidad en stock.");
+           return prev;
         }
+
         return prev.map(item => 
-          item.product.id === product.id 
+          (item.product.id === product.id && item.type === type)
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       } else {
-        return [...prev, { product, quantity: 1, price: product.basePrice }];
+        return [...prev, { 
+          product, 
+          quantity: 1, 
+          price: priceToAdd, 
+          type, 
+          unitsInPack: unitsToAdd 
+        }];
       }
     });
     setIsCartOpen(true);
   };
 
-  const removeFromCart = (productId: string) => {
-    setCart(prev => prev.filter(item => item.product.id !== productId));
+  const removeFromCart = (index: number) => {
+    setCart(prev => prev.filter((_, i) => i !== index));
   };
 
-  const updateCartItem = (productId: string, field: 'quantity' | 'price', value: number) => {
-    setCart(prev => prev.map(item => {
-      if (item.product.id === productId) {
+  const updateCartItem = (index: number, field: 'quantity' | 'price', value: number) => {
+    setCart(prev => prev.map((item, i) => {
+      if (i === index) {
         if (field === 'quantity') {
-          if (value > item.product.stock) {
+          const totalUnitsNeeded = value * item.unitsInPack;
+          if (totalUnitsNeeded > item.product.stock) {
             alert("Cantidad excede el stock disponible.");
             return item;
           }
@@ -614,7 +647,6 @@ export default function App() {
     const customerName = customer ? customer.name : (type === 'SALE' ? 'Público General' : 'Desconocido');
     const customNote = cartNote.trim() ? ` | Nota: ${cartNote.trim()}` : '';
 
-    // Prepare updates locally
     let newTransactions: Transaction[] = [];
     let newConsignments: Consignment[] = [];
     let updatedProducts = [...data.products];
@@ -622,22 +654,27 @@ export default function App() {
     
     const receiptItems: {name: string, qty: number, price: number, total: number}[] = [];
 
-    // Process each item
     cart.forEach(item => {
       const total = item.quantity * item.price;
       const transactionId = Storage.generateId();
+      
+      // Calculate total units to remove from stock
+      const unitsToRemove = item.quantity * item.unitsInPack;
 
-      // Update Stock locally in the loop
       const productIndex = updatedProducts.findIndex(p => p.id === item.product.id);
       if (productIndex !== -1) {
         updatedProducts[productIndex] = {
           ...updatedProducts[productIndex],
-          stock: updatedProducts[productIndex].stock - item.quantity
+          stock: updatedProducts[productIndex].stock - unitsToRemove
         };
       }
 
+      const itemName = item.type === 'box' 
+        ? `${item.product.name} (Caja/Paca x${item.unitsInPack})` 
+        : item.product.name;
+
       receiptItems.push({
-        name: item.product.name,
+        name: itemName,
         qty: item.quantity,
         price: item.price,
         total: total
@@ -648,13 +685,13 @@ export default function App() {
           id: transactionId,
           type: TransactionType.SALE,
           productId: item.product.id,
-          quantity: item.quantity,
-          pricePerUnit: item.price,
+          quantity: unitsToRemove, // Track total units moved in inventory
+          pricePerUnit: item.price / item.unitsInPack, // Effective unit price
           total: total,
           date: timestamp,
           customerId: customer?.id,
           customerName: customerName,
-          note: `Venta Carrito (${currentUsername}) - ${customerName}${customNote}`
+          note: `Venta (${currentUsername}): ${item.quantity} ${item.type === 'box' ? 'Cajas' : 'Unidades'} de ${item.product.name}${customNote}`
         });
       } else {
         const consignmentId = Storage.generateId();
@@ -663,8 +700,8 @@ export default function App() {
           customerId: customer!.id,
           customerName: customer!.name,
           productId: item.product.id,
-          productName: item.product.name,
-          quantity: item.quantity,
+          productName: itemName,
+          quantity: item.quantity, // Quantity of items (boxes or units)
           agreedPricePerUnit: item.price,
           totalExpected: total,
           paidAmount: 0,
@@ -677,13 +714,13 @@ export default function App() {
           id: transactionId,
           type: TransactionType.CONSIGNMENT_OUT,
           productId: item.product.id,
-          quantity: item.quantity,
-          pricePerUnit: item.price,
+          quantity: unitsToRemove,
+          pricePerUnit: item.price / item.unitsInPack,
           total: 0, 
           date: timestamp,
           customerId: customer!.id,
           customerName: customer!.name,
-          note: `Crédito (${currentUsername}) - ${customer!.name}${customNote}`,
+          note: `Crédito (${currentUsername}) - ${item.quantity} ${item.type} ${item.product.name}${customNote}`,
           relatedConsignmentId: consignmentId
         });
       }
@@ -693,20 +730,14 @@ export default function App() {
       id: Storage.generateId(),
       timestamp,
       action: type === 'SALE' ? 'VENTA MÚLTIPLE' : 'CRÉDITO ASIGNADO',
-      details: `${type === 'SALE' ? 'Venta' : 'Crédito'} de ${cart.length} productos a ${customerName} por usuario ${currentUsername}.${customNote}`
+      details: `${type === 'SALE' ? 'Venta' : 'Crédito'} de ${cart.length} items a ${customerName} por usuario ${currentUsername}.${customNote}`
     });
 
-    // Prepare Pending Data Update (Don't setData yet!)
-    const finalProducts = updatedProducts;
-    const finalTransactions = [...data.transactions, ...newTransactions];
-    const finalConsignments = [...data.consignments, ...newConsignments];
-    const finalLogs = [...newLogs, ...data.logs];
-
     const newState = {
-      products: finalProducts,
-      transactions: finalTransactions,
-      consignments: finalConsignments,
-      logs: finalLogs
+      products: updatedProducts,
+      transactions: [...data.transactions, ...newTransactions],
+      consignments: [...data.consignments, ...newConsignments],
+      logs: [...newLogs, ...data.logs]
     };
 
     const callback = () => {
@@ -718,7 +749,6 @@ export default function App() {
 
     setPendingDataUpdate({ newState, callback });
 
-    // Trigger Print Preview Modal (which acts as confirmation)
     setReceiptData({
       type: type,
       title: type === 'SALE' ? 'TICKET DE VENTA' : 'NOTA DE CRÉDITO / REMISIÓN',
@@ -745,7 +775,9 @@ export default function App() {
       category: '', 
       stock: 0,
       basePrice: 0,
-      image: null
+      image: null,
+      unitsPerBox: 0,
+      boxPrice: 0
     });
     setIsProductModalOpen(true);
   };
@@ -759,7 +791,9 @@ export default function App() {
       sku: product.sku,
       category: product.category,
       basePrice: product.basePrice,
-      image: product.image
+      image: product.image,
+      unitsPerBox: product.unitsPerBox || 0,
+      boxPrice: product.boxPrice || 0
     });
     setIsProductModalOpen(true);
   };
@@ -789,6 +823,9 @@ export default function App() {
     }
     const timestamp = new Date().toISOString();
 
+    const unitsPerBox = Number(formData.unitsPerBox) || 0;
+    const boxPrice = Number(formData.boxPrice) || 0;
+
     if (isEditMode && selectedProduct) {
       const updatedProduct: Product = {
         ...selectedProduct,
@@ -796,7 +833,9 @@ export default function App() {
         sku: formData.sku,
         basePrice: Number(formData.basePrice),
         category: categoryName,
-        image: formData.image
+        image: formData.image,
+        unitsPerBox: unitsPerBox,
+        boxPrice: boxPrice
       };
       const log: LogEntry = {
         id: Storage.generateId(),
@@ -819,7 +858,9 @@ export default function App() {
         basePrice: Number(formData.basePrice),
         cost: 0,
         category: categoryName,
-        image: formData.image
+        image: formData.image,
+        unitsPerBox: unitsPerBox,
+        boxPrice: boxPrice
       };
       const transaction: Transaction = {
         id: Storage.generateId(),
@@ -1111,6 +1152,75 @@ export default function App() {
     setIsReceiptEditModalOpen(true);
   };
 
+  const handleOpenEditConsignment = (consignment: Consignment) => {
+    setSelectedConsignment(consignment);
+    setFormData({
+      productName: consignment.productName,
+      totalExpected: consignment.totalExpected,
+      paidAmount: consignment.paidAmount || 0
+    });
+    setIsEditConsignmentModalOpen(true);
+  };
+
+  const handleSaveConsignmentEdits = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedConsignment) return;
+
+    const newName = formData.productName;
+    const newTotal = Number(formData.totalExpected);
+    const newPaid = Number(formData.paidAmount);
+
+    if (newTotal < 0 || newPaid < 0) {
+      alert("Los montos no pueden ser negativos.");
+      return;
+    }
+
+    const updatedConsignments = data.consignments.map(c => {
+      if (c.id === selectedConsignment.id) {
+        const isPaid = (newTotal - newPaid) < 0.1;
+        return {
+          ...c,
+          productName: newName,
+          totalExpected: newTotal,
+          paidAmount: newPaid,
+          status: isPaid ? ConsignmentStatus.PAID : ConsignmentStatus.PENDING,
+          dateSettled: isPaid ? (c.dateSettled || new Date().toISOString()) : undefined
+        };
+      }
+      return c;
+    });
+
+    // Also update the creation transaction to match history reports
+    const updatedTransactions = data.transactions.map(t => {
+      if (t.relatedConsignmentId === selectedConsignment.id && t.type === TransactionType.CONSIGNMENT_OUT) {
+         // Assuming unit price changes if total changes, keeping qty same for simplicity in this edit mode
+         return {
+           ...t,
+           total: 0, // Out transaction usually 0 cash, but we track pricePerUnit
+           pricePerUnit: newTotal / t.quantity
+         }
+      }
+      return t;
+    });
+
+    const log: LogEntry = {
+        id: Storage.generateId(),
+        timestamp: new Date().toISOString(),
+        action: 'EDITAR DEUDA',
+        details: `Edición manual deuda ${selectedConsignment.id}: ${newName} - $${newTotal} (Usuario: ${currentUsername})`
+    };
+
+    setData(prev => ({
+       ...prev,
+       consignments: updatedConsignments,
+       transactions: updatedTransactions,
+       logs: [log, ...prev.logs]
+    }));
+
+    setIsEditConsignmentModalOpen(false);
+    setFormData({});
+  };
+
   // --- User Management Actions ---
 
   const handleOpenUserModal = (user: AppUser | null) => {
@@ -1291,7 +1401,7 @@ export default function App() {
     if (!aiQuery.trim()) return;
     setAiLoading(true);
     setAiResponse(null);
-    const response = await analyzeBusinessData(data, aiQuery);
+    const response = await analyzeBusinessData(data, aiQuery, data.settings?.apiKey);
     setAiResponse(response);
     setAiLoading(false);
   };
@@ -1482,26 +1592,45 @@ export default function App() {
               </div>
             </div>
           </div>
-          <div className="mt-2 text-sm text-gray-600">
+          <div className="mt-2 text-sm text-gray-600 space-y-1">
             <div className="flex justify-between items-center">
-              <span>Precio:</span>
-              <span className="font-bold text-xl text-indigo-600">${product.basePrice.toFixed(2)}</span>
+              <span>Unidad:</span>
+              <span className="font-bold text-lg text-indigo-600">${product.basePrice.toFixed(2)}</span>
             </div>
+            {product.unitsPerBox && product.unitsPerBox > 0 && (
+              <div className="flex justify-between items-center text-xs text-emerald-700 bg-emerald-50 px-2 py-1 rounded">
+                <span className="flex items-center gap-1"><Box size={12}/> Caja ({product.unitsPerBox}u):</span>
+                <span className="font-bold">${product.boxPrice?.toFixed(2)}</span>
+              </div>
+            )}
           </div>
-          <div className="mt-4 flex gap-2">
+          
+          <div className="mt-4 flex flex-col gap-2">
+             <div className="flex gap-2">
+               <Button 
+                  variant="primary" 
+                  className="flex-1 text-xs" 
+                  onClick={() => handleAddToCart(product, 'unit')}
+                  disabled={product.stock <= 0}
+                >
+                 <Plus size={14} /> Unidad
+               </Button>
+               {product.unitsPerBox && product.unitsPerBox > 0 && (
+                 <Button 
+                    variant="secondary" 
+                    className="flex-1 text-xs bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100" 
+                    onClick={() => handleAddToCart(product, 'box')}
+                    disabled={product.stock < product.unitsPerBox}
+                  >
+                   <Layers size={14} /> Caja
+                 </Button>
+               )}
+             </div>
              {userRole === 'admin' && (
-               <Button variant="secondary" className="px-2" onClick={() => { setSelectedProduct(product); setIsStockModalOpen(true); }} title="Agregar Stock">
-                 <Plus size={16} />
+               <Button variant="secondary" className="w-full text-xs py-1 h-8" onClick={() => { setSelectedProduct(product); setIsStockModalOpen(true); }} title="Agregar Stock">
+                 Agregar Stock
                </Button>
              )}
-             <Button 
-                variant="primary" 
-                className="w-full flex-1" 
-                onClick={() => handleAddToCart(product)}
-                disabled={product.stock <= 0}
-              >
-               <ShoppingBag size={16} /> Agregar
-             </Button>
           </div>
         </Card>
       ))}
@@ -1519,26 +1648,17 @@ export default function App() {
       <table className="w-full text-sm text-left">
         <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100">
           <tr>
-            <th className="px-6 py-4">Imagen</th>
-            <th className="px-6 py-4">Producto / SKU</th>
+            <th className="px-6 py-4">Producto</th>
             <th className="px-6 py-4">Categoría</th>
-            <th className="px-6 py-4">Stock</th>
-            <th className="px-6 py-4">Precio</th>
+            <th className="px-6 py-4">Stock Total</th>
+            <th className="px-6 py-4">Precio Unidad</th>
+            <th className="px-6 py-4">Precio Caja</th>
             <th className="px-6 py-4 text-right">Acciones</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100">
           {filteredProducts.map(product => (
             <tr key={product.id} className="hover:bg-gray-50/50">
-              <td className="px-6 py-3">
-                <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center border border-gray-200">
-                  {product.image ? (
-                    <img src={product.image} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <ImageIcon size={20} className="text-gray-300" />
-                  )}
-                </div>
-              </td>
               <td className="px-6 py-3">
                 <div className="font-bold text-gray-800">{product.name}</div>
                 <div className="text-xs text-gray-500 font-mono">{product.sku}</div>
@@ -1554,41 +1674,24 @@ export default function App() {
               <td className="px-6 py-3 font-medium">
                 ${product.basePrice.toFixed(2)}
               </td>
+              <td className="px-6 py-3 font-medium">
+                {product.unitsPerBox ? (
+                  <span className="text-emerald-700 text-xs">${product.boxPrice?.toFixed(2)} ({product.unitsPerBox}u)</span>
+                ) : <span className="text-gray-400">-</span>}
+              </td>
               <td className="px-6 py-3 text-right">
                 <div className="flex justify-end gap-2">
-                  {userRole === 'admin' && (
-                    <>
-                      <button 
-                        onClick={() => handleOpenEditProductModal(product)}
-                        className="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
-                        title="Editar"
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button 
-                         onClick={() => { setSelectedProduct(product); setIsStockModalOpen(true); }}
-                         className="p-1.5 text-blue-500 hover:text-blue-700 hover:bg-blue-50 rounded transition-colors"
-                         title="Agregar Stock"
-                      >
-                        <Plus size={16} />
-                      </button>
-                    </>
+                  <button onClick={() => handleAddToCart(product, 'unit')} className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded" title="Agregar Unidad"><Plus size={16}/></button>
+                  {product.unitsPerBox && product.unitsPerBox > 0 && (
+                    <button onClick={() => handleAddToCart(product, 'box')} className="p-1.5 text-emerald-600 hover:bg-emerald-50 rounded" title="Agregar Caja" disabled={product.stock < product.unitsPerBox}><Layers size={16}/></button>
                   )}
-                  <button 
-                     onClick={() => handleAddToCart(product)}
-                     className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded transition-colors"
-                     title="Agregar al Carrito"
-                     disabled={product.stock <= 0}
-                  >
-                    <ShoppingBag size={16} />
-                  </button>
+                  {userRole === 'admin' && (
+                    <button onClick={() => handleOpenEditProductModal(product)} className="p-1.5 text-gray-500 hover:bg-gray-50 rounded"><Pencil size={16}/></button>
+                  )}
                 </div>
               </td>
             </tr>
           ))}
-          {filteredProducts.length === 0 && (
-            <tr><td colSpan={6} className="text-center py-8 text-gray-400">No hay productos.</td></tr>
-          )}
         </tbody>
       </table>
     </div>
@@ -1667,10 +1770,16 @@ export default function App() {
                   <div className="flex justify-between items-start">
                     <div>
                        <h4 className="font-semibold text-gray-800 line-clamp-1">{item.product.name}</h4>
-                       <span className="text-xs text-gray-500">Stock: {item.product.stock}</span>
+                       <div className="flex items-center gap-2 text-xs text-gray-500">
+                         {item.type === 'box' ? (
+                           <span className="bg-emerald-50 text-emerald-700 px-1.5 rounded flex items-center gap-1"><Box size={10}/> Caja x{item.unitsInPack}</span>
+                         ) : (
+                           <span className="bg-gray-100 px-1.5 rounded">Unidad</span>
+                         )}
+                       </div>
                     </div>
                     <button 
-                      onClick={() => removeFromCart(item.product.id)}
+                      onClick={() => removeFromCart(idx)}
                       className="text-red-400 hover:text-red-600 p-1"
                     >
                       <Trash2 size={16} />
@@ -1682,7 +1791,7 @@ export default function App() {
                         <div className="flex items-center border border-gray-200 rounded-lg">
                            <button 
                             className="p-1 hover:bg-gray-100"
-                            onClick={() => updateCartItem(item.product.id, 'quantity', item.quantity - 1)}
+                            onClick={() => updateCartItem(idx, 'quantity', item.quantity - 1)}
                            >
                              <Minus size={14} />
                            </button>
@@ -1690,25 +1799,25 @@ export default function App() {
                              type="number" 
                              className="w-10 text-center text-sm outline-none border-none py-1"
                              value={item.quantity}
-                             onChange={(e) => updateCartItem(item.product.id, 'quantity', Number(e.target.value))}
+                             onChange={(e) => updateCartItem(idx, 'quantity', Number(e.target.value))}
                            />
                            <button 
                              className="p-1 hover:bg-gray-100"
-                             onClick={() => updateCartItem(item.product.id, 'quantity', item.quantity + 1)}
+                             onClick={() => updateCartItem(idx, 'quantity', item.quantity + 1)}
                            >
                              <Plus size={14} />
                            </button>
                         </div>
                      </div>
                      <div className="flex flex-col items-end">
-                       <span className="text-xs text-gray-400">Precio Unit.</span>
+                       <span className="text-xs text-gray-400">Precio {item.type === 'box' ? 'Caja' : 'Unit.'}</span>
                        <div className="flex items-center text-sm font-bold text-indigo-600">
                          $
                          <input 
                            type="number"
                            className="w-16 text-right outline-none bg-transparent border-b border-indigo-100 focus:border-indigo-500"
                            value={item.price}
-                           onChange={(e) => updateCartItem(item.product.id, 'price', Number(e.target.value))}
+                           onChange={(e) => updateCartItem(idx, 'price', Number(e.target.value))}
                          />
                        </div>
                      </div>
@@ -1827,7 +1936,7 @@ export default function App() {
                <thead className="bg-gray-50 text-gray-600 font-medium border-b border-gray-100">
                  <tr>
                    <th className="px-6 py-4">Fecha</th>
-                   <th className="px-6 py-4">Producto</th>
+                   <th className="px-6 py-4">Producto / Concepto</th>
                    <th className="px-6 py-4">Cant.</th>
                    <th className="px-6 py-4">Total Orig.</th>
                    <th className="px-6 py-4 text-emerald-600">Abonado</th>
@@ -1865,6 +1974,13 @@ export default function App() {
                                Abonar Individual
                              </button>
                            )}
+                           <button 
+                              onClick={() => handleOpenEditConsignment(c)}
+                              className="p-1.5 text-gray-500 hover:bg-gray-100 rounded transition-colors"
+                              title="Editar Monto / Nombre"
+                           >
+                             <Pencil size={16} />
+                           </button>
                            <button 
                              onClick={() => {
                                // Find the creation transaction to delete it
@@ -2189,6 +2305,72 @@ export default function App() {
              <p className="text-gray-500">Gestión de datos y seguridad</p>
            </div>
            
+           <Card title="Configuración de Inteligencia Artificial (IA)">
+             <div className="space-y-4">
+                <p className="text-sm text-gray-600">
+                  Para activar el asistente de negocios, ingresa tu API Key de Google Gemini. 
+                  <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline ml-1">
+                    Conseguir API Key gratis
+                  </a>
+                </p>
+                <div>
+                   <label className="text-sm font-medium text-gray-700">Gemini API Key</label>
+                   <div className="relative mt-1">
+                     <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+                     <input 
+                       type="password" 
+                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg outline-none focus:ring-2 focus:ring-indigo-500"
+                       value={data.settings?.apiKey || ''}
+                       onChange={(e) => {
+                          setData(prev => ({
+                            ...prev,
+                            settings: { ...prev.settings, apiKey: e.target.value }
+                          }));
+                       }}
+                       placeholder="AIzaSy..."
+                     />
+                   </div>
+                   <p className="text-xs text-gray-500 mt-1">La clave se guarda localmente en tu dispositivo.</p>
+                </div>
+             </div>
+           </Card>
+
+           <Card title="Personalización del Ticket">
+             <div className="space-y-4">
+                <p className="text-sm text-gray-600">Configura los textos que aparecen en la impresión.</p>
+                <div>
+                   <label className="text-sm font-medium text-gray-700">Encabezado (Nombre, Dirección, Teléfono)</label>
+                   <textarea 
+                     className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-indigo-500"
+                     rows={3}
+                     value={data.settings?.ticketHeader || ''}
+                     onChange={(e) => {
+                        setData(prev => ({
+                          ...prev,
+                          settings: { ...prev.settings, ticketHeader: e.target.value }
+                        }));
+                     }}
+                     placeholder="Ej: The Brothers&#10;Calle Principal #123&#10;Tel: 555-0101"
+                   />
+                </div>
+                <div>
+                   <label className="text-sm font-medium text-gray-700">Pie de Página (Despedida, Web, etc.)</label>
+                   <textarea 
+                     className="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-indigo-500"
+                     rows={2}
+                     value={data.settings?.ticketFooter || ''}
+                     onChange={(e) => {
+                        setData(prev => ({
+                          ...prev,
+                          settings: { ...prev.settings, ticketFooter: e.target.value }
+                        }));
+                     }}
+                     placeholder="Ej: ¡Gracias por su compra!&#10;Vuelva pronto."
+                   />
+                </div>
+             </div>
+           </Card>
+
            <Card title="Gestión de Usuarios">
              <div className="space-y-4">
                 <div className="flex justify-between items-center">
@@ -2318,20 +2500,37 @@ export default function App() {
              </div>
              <h2 className="text-3xl font-bold text-gray-900">Asistente Inteligente</h2>
              <p className="text-gray-500 mt-2">Analiza tu negocio con el poder de Google Gemini</p>
+             
+             <div className={`mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium border ${isOnline ? (data.settings?.apiKey ? 'bg-green-50 text-green-700 border-green-200' : 'bg-yellow-50 text-yellow-700 border-yellow-200') : 'bg-red-50 text-red-700 border-red-200'}`}>
+                {isOnline ? (data.settings?.apiKey ? <Wifi size={14} /> : <AlertTriangle size={14} />) : <WifiOff size={14} />}
+                {isOnline ? (data.settings?.apiKey ? 'Online: Asistente Disponible' : 'Falta API Key (Configuración)') : 'Offline: Asistente No Disponible'}
+             </div>
            </div>
 
-           <Card className="shadow-lg border-0 ring-1 ring-gray-100">
+           <Card className="shadow-lg border-0 ring-1 ring-gray-100 relative">
+              {(!isOnline || !data.settings?.apiKey) && (
+                <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] z-10 flex items-center justify-center rounded-xl">
+                   <div className="bg-white p-4 rounded-lg shadow-xl border border-red-100 text-center max-w-xs">
+                      <AlertCircle className={`mx-auto mb-2 ${!isOnline ? 'text-red-400' : 'text-yellow-500'}`} size={32} />
+                      <p className="font-bold text-gray-800">{!isOnline ? 'Sin Conexión' : 'Falta Configuración'}</p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {!isOnline ? 'Conecta tu PC a internet.' : 'Agrega tu API Key de Gemini en Configuración.'}
+                      </p>
+                   </div>
+                </div>
+              )}
               <textarea 
                 className="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none resize-none text-lg min-h-[120px]"
                 placeholder="Ej: ¿Qué productos debería reponer pronto? ¿Quién es mi mejor cliente? Dame un consejo para aumentar ventas..."
                 value={aiQuery}
                 onChange={(e) => setAiQuery(e.target.value)}
+                disabled={!isOnline || aiLoading}
               />
               <div className="mt-4 flex justify-end">
                 <Button 
                    onClick={handleAskAI} 
-                   disabled={aiLoading || !aiQuery.trim()}
-                   className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md transform transition hover:-translate-y-0.5"
+                   disabled={aiLoading || !aiQuery.trim() || !isOnline || !data.settings?.apiKey}
+                   className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md transform transition hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {aiLoading ? <RefreshCw className="animate-spin" /> : <BrainCircuit size={18} />}
                   {aiLoading ? 'Analizando...' : 'Analizar Negocio'}
@@ -2373,7 +2572,7 @@ export default function App() {
           <div className="h-16 flex items-center px-6 border-b border-gray-100">
             <Package className="text-indigo-600 mr-2" size={24} />
             <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-              Almacén Pro
+              The Brothers
             </h1>
           </div>
 
@@ -2518,16 +2717,38 @@ export default function App() {
           <Input label="Nombre del Producto" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required autoFocus />
           
           <div className="grid grid-cols-2 gap-4">
-             <Input label="Precio Venta ($)" type="number" step="0.01" value={formData.basePrice} onChange={e => setFormData({...formData, basePrice: e.target.value})} required />
-             {!isEditMode && (
-               <Input label="Stock Inicial" type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} required />
-             )}
+             <Input label="Precio Venta Unidad ($)" type="number" step="0.01" value={formData.basePrice} onChange={e => setFormData({...formData, basePrice: e.target.value})} required/>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+             <Input label="Stock Total (Unidades)" type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} required/>
+             <Input label="Categoría" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} list="cats" />
+             <datalist id="cats">{data.categories.map(c => <option key={c} value={c}/>)}</datalist>
           </div>
           
-          <div className="pt-4 flex gap-3">
-             <Button type="button" variant="secondary" onClick={() => setIsProductModalOpen(false)} className="flex-1">Cancelar</Button>
-             <Button type="submit" className="flex-1">Guardar</Button>
+          <div className="p-3 bg-indigo-50 border border-indigo-100 rounded-lg space-y-3">
+             <h4 className="text-sm font-bold text-indigo-800 flex items-center gap-2"><Layers size={14} /> Configuración de Venta por Caja/Paca</h4>
+             <div className="grid grid-cols-2 gap-4">
+               <Input 
+                 label="Unidades por Caja" 
+                 type="number" 
+                 min="0"
+                 placeholder="Ej. 24"
+                 value={formData.unitsPerBox || ''} 
+                 onChange={e => setFormData({...formData, unitsPerBox: e.target.value})} 
+               />
+               <Input 
+                 label="Precio de Venta Caja ($)" 
+                 type="number" 
+                 step="0.01"
+                 placeholder="Opcional"
+                 value={formData.boxPrice || ''} 
+                 onChange={e => setFormData({...formData, boxPrice: e.target.value})} 
+               />
+             </div>
+             <p className="text-xs text-indigo-600">Deja en 0 si no vendes este producto por caja.</p>
           </div>
+
+          <div className="pt-4 flex gap-3"><Button type="button" variant="secondary" onClick={() => setIsProductModalOpen(false)} className="flex-1">Cancelar</Button><Button type="submit" className="flex-1">Guardar</Button></div>
         </form>
       </Modal>
 
@@ -2709,7 +2930,7 @@ export default function App() {
 
            {/* Preview Area */}
            <div className="flex-1 bg-gray-100 p-4 rounded-xl flex items-center justify-center border border-gray-200">
-               {editableReceiptData && <ReceiptTemplate data={editableReceiptData} />}
+               {editableReceiptData && <ReceiptTemplate data={editableReceiptData} settings={data.settings} />}
            </div>
         </div>
       </Modal>
@@ -2717,7 +2938,7 @@ export default function App() {
       {/* Hidden Print Area - Only rendered via Portal when needed */}
       {editableReceiptData && createPortal(
         <div id="print-content">
-          <ReceiptTemplate data={editableReceiptData} />
+          <ReceiptTemplate data={editableReceiptData} settings={data.settings} />
         </div>,
         document.getElementById('receipt-area')!
       )}

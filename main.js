@@ -1,3 +1,4 @@
+
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
@@ -17,7 +18,7 @@ const createWindow = () => {
       nodeIntegration: true,
       contextIsolation: false, // For simple migration. In production, use preload scripts.
     },
-    title: "Almacén Pro",
+    title: "The Brothers",
     icon: path.join(__dirname, 'icon.png') // Ensure you have an icon if you build
   });
 

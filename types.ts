@@ -1,4 +1,5 @@
 
+
 export enum TransactionType {
   STOCK_IN = 'STOCK_IN',
   SALE = 'SALE',
@@ -50,6 +51,9 @@ export interface Product {
   cost: number; // Cost to acquire
   category: string;
   image?: string; // Base64 encoded image string
+  // Add new properties for box/pack sales
+  unitsPerBox?: number;
+  boxPrice?: number;
 }
 
 export interface Transaction {
